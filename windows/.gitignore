@@ -1,0 +1,32 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Native DLLs — fetch with scripts/fetch-native.ps1, do not commit
+vendor/openconnect/bin/**
+vendor/openconnect/lib/**
+vendor/wintun/**
+!vendor/**/.gitkeep
+!vendor/README.md
+!vendor/NOTICE.txt
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

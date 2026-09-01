@@ -1,0 +1,6 @@
+Native OpenConnect binaries under vendor/openconnect/bin are from the
+OpenConnect project (LGPL-2.1) and may be copied from an OpenConnect-GUI
+installation for local development.
+
+Upstream: https://gitlab.com/openconnect/openconnect
+Wintun: https://www.wintun.net/

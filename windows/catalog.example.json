@@ -1,0 +1,6 @@
+{
+  "profiles": [
+    { "name": "Germany", "server": "de.example.com" },
+    { "name": "Netherlands", "server": "nl.example.com:443" }
+  ]
+}
