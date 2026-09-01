@@ -26,7 +26,8 @@ windows/node_modules/
 windows/dist/
 windows/src-tauri/target/
 windows/src-tauri/gen/
-
+windows/build.cmd
+windows/Build.md
 # Packages — except the stable Windows installer and Android APK GitHub serves
 *.exe
 *.apk
