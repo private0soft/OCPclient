@@ -8,7 +8,7 @@ cd /d "%~dp0"
 REM ---------- release values (edit these) ----------
 set "VERSION=1.0.4"
 set "VERSION_CODE=104"
-set "UPDATE_URL=https://raw.githubusercontent.com/private0soft/ocp/refs/heads/main/ex.json"
+set "UPDATE_URL=https://raw.githubusercontent.com/private0soft/OCPclient/refs/heads/main/windows/ex.json"
 REM -------------------------------------------------
 
 if /i "%~1"==":finalize_only" goto finalize_release
