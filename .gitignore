@@ -12,7 +12,7 @@ Thumbs.db
 **/*.jks
 **/*.keystore
 **/*.pem
-android/
+
 # Android local build trees
 android/.gradle/
 android/.idea/
