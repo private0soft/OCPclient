@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="myoc_bg">#070B12</color>
+    <color name="myoc_bg_top">#0B1820</color>
+    <color name="myoc_bg_elevated">#0E1522</color>
+    <color name="myoc_surface">#151E2E</color>
+    <color name="myoc_surface_high">#1C2740</color>
+    <color name="myoc_surface_stroke">#2C3A55</color>
+    <color name="myoc_accent">#2EE6A6</color>
+    <color name="myoc_accent_soft">#143D32</color>
+    <color name="myoc_accent_dim">#1A5C45</color>
+    <color name="myoc_warn">#FFB020</color>
+    <color name="myoc_warn_text">#070B12</color>
+    <color name="myoc_danger">#FF5C6A</color>
+    <color name="myoc_danger_dim">#4A1E24</color>
+    <color name="myoc_text">#F4F7FB</color>
+    <color name="myoc_text_muted">#7F8FA8</color>
+    <color name="myoc_divider">#1E2A3D</color>
+    <color name="myoc_nav_inactive">#5C6B82</color>
+    <color name="myoc_ring_outer">#1A3D33</color>
+    <color name="myoc_btn_on_accent">#070B12</color>
+    <color name="myoc_ripple_on_accent">#33000000</color>
+    <color name="myoc_ripple_on_danger">#40FFFFFF</color>
+    <color name="myoc_ripple_on_surface">#33000000</color>
+</resources>

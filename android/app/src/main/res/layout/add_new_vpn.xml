@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="9dp"
+    android:paddingBottom="3dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="10dp">
+
+    <LinearLayout
+        android:id="@+id/parentPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_name"
+            android:textAppearance="@style/MyOC.Meta" />
+
+        <EditText
+            android:id="@+id/profile_name_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:hint="@string/profile_name"
+            android:inputType="text|textCapSentences|textNoSuggestions"
+            android:importantForAutofill="no"
+            android:textColor="@color/myoc_text"
+            android:textColorHint="@color/myoc_text_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/server_address"
+            android:textAppearance="@style/MyOC.Meta" />
+
+        <EditText
+            android:id="@+id/entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:hint="@string/server_address"
+            android:inputType="textUri"
+            android:importantForAutofill="no"
+            android:textColor="@color/myoc_text"
+            android:textColorHint="@color/myoc_text_muted">
+            <requestFocus />
+        </EditText>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/login_username"
+            android:textAppearance="@style/MyOC.Meta" />
+
+        <EditText
+            android:id="@+id/username_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:hint="@string/login_username"
+            android:inputType="text|textNoSuggestions"
+            android:importantForAutofill="no"
+            android:textColor="@color/myoc_text"
+            android:textColorHint="@color/myoc_text_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/login_password"
+            android:textAppearance="@style/MyOC.Meta" />
+
+        <EditText
+            android:id="@+id/password_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:hint="@string/login_password"
+            android:inputType="textPassword"
+            android:importantForAutofill="no"
+            android:textColor="@color/myoc_text"
+            android:textColorHint="@color/myoc_text_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textStyle="italic"
+            android:text="@string/hostname_examples"
+            android:textColor="@color/myoc_text_muted"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>

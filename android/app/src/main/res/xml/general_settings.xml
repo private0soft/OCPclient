@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<!--
+    <PreferenceCategory android:title="@string/appbehaviour">
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="restartvpnonboot"
+                android:summary="@string/onbootrestartsummary"
+                android:title="@string/onbootrestart"/>
+
+        <Preference
+                android:key="clearapi"
+                android:persistent="false"
+                android:title="Clear allowed external apps"/>
+    </PreferenceCategory>
+-->
+
+    <PreferenceCategory android:title="@string/appearance_category">
+        <ListPreference
+            android:key="app_theme"
+            android:title="@string/theme_title"
+            android:summary="@string/theme_summary"
+            android:dialogTitle="@string/theme_title"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="system" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/authentication">
+        <Preference
+            android:key="saved_domain_logins"
+            android:persistent="false"
+            android:title="@string/saved_logins_title"
+            android:summary="@string/saved_logins_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/vpnbehaviour">
+<!--
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="usesystemproxy"
+                android:summary="@string/use_system_proxy_summary"
+                android:title="@string/use_system_proxy"/>
+-->
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="netchangereconnect"
+                android:summary="@string/netchange_summary"
+                android:title="@string/netchange"/>
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="screenoff"
+                android:summary="@string/screenoff_summary"
+                android:title="@string/screenoff_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/per_app_global_title">
+        <ListPreference
+            android:key="global_per_app_mode"
+            android:title="@string/per_app_global_mode"
+            android:dialogTitle="@string/per_app_global_mode"
+            android:entries="@array/per_app_mode_entries"
+            android:entryValues="@array/per_app_mode_values"
+            android:defaultValue="all" />
+        <Preference
+            android:key="global_per_app_packages"
+            android:persistent="false"
+            android:title="@string/per_app_select_apps"
+            android:summary="@string/per_app_select_apps_summary" />
+        <Preference
+            android:key="per_app_reconnect_hint"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/per_app_reconnect_hint"
+            android:title="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/update_category">
+        <CheckBoxPreference
+            android:key="update_checks_enabled"
+            android:title="@string/update_checks_enabled_title"
+            android:summary="@string/update_checks_enabled_summary"
+            android:defaultValue="false" />
+        <Preference
+            android:key="update_check_now"
+            android:dependency="update_checks_enabled"
+            android:persistent="false"
+            android:title="@string/update_check_now"
+            android:summary="@string/update_check_now_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/advanced">
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="log_enabled"
+                android:summary="@string/log_enabled_summary"
+                android:title="@string/log_enabled"/>
+        <ListPreference
+            android:key="log_level"
+            android:dependency="log_enabled"
+            android:title="@string/log_level"
+            android:dialogTitle="@string/log_level"
+            android:entries="@array/log_level_entries"
+            android:entryValues="@array/log_level_values"
+            android:defaultValue="info" />
+        <ListPreference
+            android:key="timestamp_format"
+            android:dependency="log_enabled"
+            android:title="@string/timestamp_format"
+            android:dialogTitle="@string/timestamp_format"
+            android:entries="@array/log_timestamp_entries"
+            android:entryValues="@array/log_timestamp_values"
+            android:defaultValue="short" />
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="lookup_public_ip"
+                android:summary="@string/lookup_public_ip_summary"
+                android:title="@string/lookup_public_ip"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

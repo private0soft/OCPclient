@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_gradient"
+    android:orientation="vertical"
+    android:padding="@dimen/stdpadding">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/log"
+        android:textAppearance="@style/MyOC.Brand"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_surface"
+        android:padding="14dp"
+        android:singleLine="true"
+        android:text="@string/speed_waiting"
+        android:textColor="@color/myoc_accent"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/bg_divider"
+        android:dividerHeight="1dp"
+        android:transcriptMode="normal" />
+
+</LinearLayout>

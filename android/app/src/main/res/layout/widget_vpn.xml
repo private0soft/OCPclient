@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card_off"
+    android:contentDescription="@string/widget_description"
+    android:gravity="center_horizontal|center_vertical"
+    android:orientation="vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <FrameLayout
+        android:id="@+id/widget_ring"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_widget_ring_off">
+
+        <FrameLayout
+            android:id="@+id/widget_face"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_widget_off">
+
+            <ImageView
+                android:id="@+id/widget_flag"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/app"
+                android:scaleType="fitXY"
+                android:src="@drawable/bg_widget_off"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/widget_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/widget_connect"
+                android:src="@drawable/ic_widget_vpn_off" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/widget_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="@string/widget_connect"
+        android:textColor="@color/myoc_text"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <TextView
+        android:id="@+id/widget_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="@string/app"
+        android:textColor="@color/myoc_text_muted"
+        android:textSize="11sp" />
+</LinearLayout>

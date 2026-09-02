@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Status: scrollable content + fixed bottom actions.
+  Avoids weight-spaced "fixed height" layout that pushes Disconnect off-screen
+  on Samsung/Xiaomi (larger fonts, nav bars, display size).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/stdpadding"
+    android:paddingEnd="@dimen/stdpadding"
+    android:paddingTop="8dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/status"
+        android:textColor="@color/myoc_text"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp">
+
+            <FrameLayout
+                android:layout_width="@dimen/myoc_orb"
+                android:layout_height="@dimen/myoc_orb"
+                android:layout_gravity="center_horizontal">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_orb_outer" />
+
+                <View
+                    android:id="@+id/status_orb_inner"
+                    android:layout_width="112dp"
+                    android:layout_height="112dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_orb_inner" />
+
+                <ImageView
+                    android:id="@+id/status_orb_flag_img"
+                    android:layout_width="112dp"
+                    android:layout_height="112dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/app"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/status_orb_progress"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/myoc_accent"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/status_orb_flag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="VPN"
+                    android:textColor="@color/myoc_accent"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/connection_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:gravity="center"
+                android:textColor="@color/myoc_text"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/connection_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textAppearance="@style/MyOC.Body"
+                android:visibility="invisible" />
+
+            <LinearLayout
+                android:id="@+id/connection_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_surface"
+                android:orientation="vertical"
+                android:padding="18dp"
+                android:visibility="invisible">
+
+                <LinearLayout
+                    android:id="@+id/status_rates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tx"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/myoc_text"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/rx"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/myoc_text"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/public_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@color/myoc_text"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/public_ip4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/myoc_text"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/public_ip6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/myoc_text"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/server_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:textColor="@color/myoc_text_muted"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/status_switch_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/myoc_text"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/status_local_ip4_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/local_ip4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/myoc_text_muted"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/local_ip4_netmask"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/myoc_text_muted"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/local_ip6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/myoc_text_muted"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tunnel_crypto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/myoc_text_muted"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Fixed action bar: always visible above nav / gesture inset -->
+    <LinearLayout
+        android:id="@+id/switch_server_button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/myoc_btn_height"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_button_outline"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/switch_server_flags"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/switch_server_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/switch_server"
+            android:textColor="@color/myoc_text"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/disconnect_button"
+        style="@style/MyOC.Button.Danger"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/myoc_btn_height"
+        android:background="@drawable/bg_button_disconnect"
+        android:text="@string/disconnect"
+        android:visibility="gone" />
+
+</LinearLayout>

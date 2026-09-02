@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
+
+    <TextView
+        android:id="@+id/action_add_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_header_add"
+        android:contentDescription="@string/menu_add_profile"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:minWidth="36dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:text="@string/header_add_profile"
+        android:textColor="@color/myoc_btn_on_accent"
+        android:textSize="13sp" />
+</FrameLayout>

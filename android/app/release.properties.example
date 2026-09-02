@@ -1,0 +1,5 @@
+# Copy to release.properties and fill in your keystore password.
+# Do not commit release.properties or your .jks file.
+path=/home/masoud/myoc-release.jks
+alias=myoc
+password=YOUR_KEYSTORE_PASSWORD
