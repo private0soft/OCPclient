@@ -9,9 +9,38 @@ REM ============================================================================
 
 cd /d "%~dp0"
 
+call :find_java
+if not defined JAVA_HOME (
+  echo ERROR: JDK 17 was not found. Install Microsoft OpenJDK 17 or set JAVA_HOME.
+  exit /b 1
+)
+echo   JAVA_HOME    %JAVA_HOME%
+
+if not defined ANDROID_HOME (
+  if exist "%LOCALAPPDATA%\Android\Sdk" set "ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk"
+)
+if defined ANDROID_HOME echo   ANDROID_HOME %ANDROID_HOME%
+
+if not exist "%~dp0gradlew.bat" (
+  echo ERROR: gradlew.bat is missing
+  exit /b 1
+)
+if not exist "%~dp0gradle\wrapper\gradle-wrapper.jar" (
+  echo ERROR: gradle-wrapper.jar is missing
+  exit /b 1
+)
+if not exist "%~dp0app\src\main\jniLibs\arm64-v8a\libopenconnect.so" (
+  echo ERROR: native libs missing: app\src\main\jniLibs\arm64-v8a\libopenconnect.so
+  exit /b 1
+)
+if not exist "%~dp0app\src\main\jniLibs\arm64-v8a\libstoken.so" (
+  echo ERROR: native libs missing: app\src\main\jniLibs\arm64-v8a\libstoken.so
+  exit /b 1
+)
+
 REM ---------- release values (edit these) ----------
-set "VERSION=1.0.4"
-set "VERSION_CODE=104"
+set "VERSION=1.0.5"
+set "VERSION_CODE=105"
 set "UPDATE_URL=https://raw.githubusercontent.com/private0soft/OCPclient/refs/heads/main/android/ap.json"
 set "NOTES=Latest Android release"
 set "APK_URL="
@@ -124,10 +153,11 @@ if errorlevel 1 (
 )
 
 set "SRC=%~dp0app\build\outputs\apk\release\app-release.apk"
-set "DST=%~dp0..\OpenConnect-P-latest-release.apk"
+if not exist "%SRC%" set "SRC=%~dp0app\build\outputs\apk\release\app-release-unsigned.apk"
+set "DST=%~dp0..\android\OpenConnect-P-latest-release.apk"
 
 if not exist "%SRC%" (
-  echo ERROR: release APK not found: %SRC%
+  echo ERROR: release APK not found under app\build\outputs\apk\release
   exit /b 1
 )
 
@@ -164,4 +194,38 @@ echo   APK:      %DST%
 echo   Manifest: %~dp0ap.json
 echo   Upload ap.json to: %UPDATE_URL%
 echo   Upload APK to:     %APK_URL%
+echo %SRC% | findstr /I unsigned >nul
+if not errorlevel 1 (
+  echo.
+  echo NOTE: APK is unsigned. Put myoc-release.jks in android\app
+)
 exit /b 0
+
+:find_java
+if defined JAVA_HOME (
+  if exist "%JAVA_HOME%\bin\java.exe" goto :eof
+)
+set "JAVA_HOME="
+if exist "%USERPROFILE%\.jdks\jdk-17\bin\java.exe" (
+  set "JAVA_HOME=%USERPROFILE%\.jdks\jdk-17"
+  goto :eof
+)
+for /d %%J in ("%ProgramFiles%\Microsoft\jdk-17*") do (
+  if exist "%%J\bin\java.exe" (
+    set "JAVA_HOME=%%J"
+    goto :eof
+  )
+)
+for /d %%J in ("%ProgramFiles%\Eclipse Adoptium\jdk-17*") do (
+  if exist "%%J\bin\java.exe" (
+    set "JAVA_HOME=%%J"
+    goto :eof
+  )
+)
+for /d %%J in ("%ProgramFiles%\Java\jdk-17*") do (
+  if exist "%%J\bin\java.exe" (
+    set "JAVA_HOME=%%J"
+    goto :eof
+  )
+)
+goto :eof

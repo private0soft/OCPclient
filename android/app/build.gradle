@@ -29,18 +29,32 @@ android {
             abiFilters 'arm64-v8a'
         }
     }
-    if (file("release.properties").exists()) {
+    def releasePropsFile = file("release.properties")
+    def releaseKeystore = null
+    def releaseAlias = null
+    def releasePassword = null
+    if (releasePropsFile.exists()) {
+        def properties = new Properties()
+        properties.load(new FileInputStream(releasePropsFile))
+        def path = properties['path']
+        if (path != null) {
+            def ks = file(path)
+            if (ks.exists()) {
+                releaseKeystore = ks
+                releaseAlias = properties['alias']
+                releasePassword = properties['password']
+            } else {
+                logger.warn("release.properties keystore not found: ${path} — release APK will be unsigned")
+            }
+        }
+    }
+    if (releaseKeystore != null) {
         signingConfigs {
             release {
-                file("release.properties").with {
-                    def properties = new Properties()
-                    properties.load(new FileInputStream(it))
-
-                    storeFile file(properties['path'])
-                    keyAlias properties['alias']
-                    storePassword properties['password']
-                    keyPassword properties['password']
-                }
+                storeFile releaseKeystore
+                keyAlias releaseAlias
+                storePassword releasePassword
+                keyPassword releasePassword
             }
         }
     }
@@ -48,7 +62,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (file("release.properties").exists()) {
+            if (releaseKeystore != null) {
                 signingConfig signingConfigs.release
             }
         }

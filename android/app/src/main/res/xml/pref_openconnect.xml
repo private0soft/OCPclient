@@ -3,12 +3,12 @@
     <PreferenceCategory
         android:title="@string/server"
         android:key="pref_key_server">
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:key="profile_name"
             android:title="@string/profile_name"
             android:inputType="text|textNoSuggestions|textCapSentences"
             android:defaultValue="" />
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:key="server_address"
             android:title="@string/server_address"
             android:dialogMessage="@string/add_profile_hostname_prompt"
@@ -87,7 +87,7 @@
             android:title="@string/disable_ipv6"
             android:summary="@string/disable_ipv6_summary"
             android:defaultValue="true" />
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:key="requested_mtu"
             android:title="@string/requested_mtu"
             android:dialogMessage="@string/requested_mtu_message"
@@ -109,7 +109,7 @@
             android:entries="@array/split_tunnel_mode_entries"
             android:entryValues="@array/split_tunnel_mode_values"
             android:defaultValue="auto" />
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:key="split_tunnel_networks"
             android:title="@string/split_tunnel_networks"
             android:dialogMessage="@string/split_tunnel_networks_message"
@@ -134,7 +134,7 @@
             android:persistent="false"
             android:title="@string/per_app_select_apps"
             android:summary="@string/per_app_select_apps_summary" />
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:defaultValue=""
             android:dialogMessage="@string/sni_hint"
             android:key="sni"
@@ -154,7 +154,7 @@
             android:title="@string/dpd_override"
             android:summary="@string/dpd_override_summary"
             android:defaultValue="false" />
-        <EditTextPreference
+        <net.openconnect_vpn.android.TextPref
             android:key="dpd_value"
             android:title="@string/dpd_value"
             android:dependency="dpd_override"

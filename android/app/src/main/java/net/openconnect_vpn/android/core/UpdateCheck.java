@@ -1,5 +1,6 @@
 /*
- * HTTPS-only version manifest + in-app APK download.
+ * HTTPS-only version manifest. Automatic checks are silent.
+ * The download URL is opened in the browser when the user taps Update.
  *
  * Expected JSON:
  * {
@@ -24,14 +25,12 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,23 +40,24 @@ public final class UpdateCheck {
 
 	public static final String TAG = "OpenConnect";
 
-	/** Opt-in: when false, no automatic or manual update checks run. */
-	public static final String PREF_ENABLED = "update_checks_enabled";
-	public static final String PREF_LAST_MS = "update_last_check_ms";
-	public static final String PREF_SNOOZE_CODE = "update_snooze_code";
-
-	private static final long MIN_INTERVAL_MS = 24L * 60L * 60L * 1000L;
 	private static final int MAX_BODY = 16 * 1024;
 	private static final int TIMEOUT_MS = 8000;
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
 	private static final List<Listener> sListeners = new ArrayList<Listener>();
 	private static Info sPending = null;
+	private static Context sApp = null;
 	private static boolean sChecking = false;
+	private static boolean sLaunchTried = false;
+	private static boolean sConnectTried = false;
+	private static boolean sConnectScheduled = false;
+	private static boolean sWantConnectCheck = false;
+	private static boolean sHaveResult = false;
 
 	public static final class Info {
 		public boolean available;
 		public boolean checked;
+		public boolean failed;
 		public int versionCode;
 		public String versionName = "";
 		public String notes = "";
@@ -81,9 +81,7 @@ public final class UpdateCheck {
 				sListeners.add(listener);
 			}
 		}
-		if (sPending != null) {
-			listener.onUpdateState(sPending, sChecking);
-		}
+		listener.onUpdateState(sPending, sChecking);
 	}
 
 	public static void removeListener(Listener listener) {
@@ -92,72 +90,62 @@ public final class UpdateCheck {
 		}
 	}
 
-	public static boolean isEnabled(Context context) {
-		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
-		return getBoolPref(p, PREF_ENABLED, false);
+	public static Info current() {
+		return sPending;
 	}
 
-	public static String manifestUrl(Context context) {
-		return resolveUrl(context);
+	public static boolean isChecking() {
+		return sChecking;
 	}
 
-	/** Built-in manifest only — never a user-entered URL. */
-	private static String resolveUrl(Context context) {
-		if (!isEnabled(context)) {
+	public static String installedVersionName(Context context) {
+		try {
+			PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			return pi.versionName != null ? pi.versionName : "";
+		} catch (Exception e) {
 			return "";
 		}
-		String url = UpdateDefaults.bakedManifestUrl();
-		return url != null ? url.trim() : "";
 	}
 
-	public static void maybeCheck(final Activity activity) {
-		if (activity == null || !isEnabled(activity) || resolveUrl(activity).length() == 0) {
+	/** Silent check when the app is opened. Does not require VPN. Failure is ignored. */
+	public static void maybeCheck(Activity activity) {
+		if (activity == null || sLaunchTried || sChecking || sHaveResult) {
 			return;
 		}
-		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(activity);
-		long last = getLongPref(p, PREF_LAST_MS, 0);
-		if (System.currentTimeMillis() - last < MIN_INTERVAL_MS) {
-			if (sPending != null && sPending.available) {
-				notifyListeners(sPending, false);
-			}
-			return;
-		}
-		check(activity, false, false);
+		rememberApp(activity);
+		sLaunchTried = true;
+		check(sApp, true);
 	}
 
-	public static void runNow(Activity activity) {
+	/** Silent check once after the first VPN connect in this process. */
+	public static void checkAfterConnect(Activity activity) {
 		if (activity == null) {
 			return;
 		}
-		if (!isEnabled(activity)) {
-			Toast.makeText(activity, R.string.update_checks_disabled, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		if (resolveUrl(activity).length() == 0) {
-			Toast.makeText(activity, R.string.update_check_failed, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		check(activity, true, true);
+		rememberApp(activity);
+		sWantConnectCheck = true;
+		tryConnectCheck(true);
 	}
 
-	public static void checkAfterConnect(final Activity activity) {
-		if (activity == null || !isEnabled(activity) || resolveUrl(activity).length() == 0) {
+	/**
+	 * Settings button. If an update is already known, opens the download URL.
+	 * If the app is already current, does nothing (avoids repeat requests).
+	 */
+	public static void runNow(Activity activity) {
+		if (activity == null || sChecking) {
 			return;
 		}
-		if (sPending != null && sPending.available) {
-			return;
-		}
-		new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if (!activity.isFinishing() && isEnabled(activity)) {
-					check(activity, false, false);
-				}
+		if (sHaveResult && sPending != null) {
+			if (sPending.available) {
+				startInstall(activity);
 			}
-		}, 2500);
+			return;
+		}
+		rememberApp(activity);
+		check(sApp, false);
 	}
 
-	public static void startInstall(final Activity activity) {
+	public static void startInstall(Activity activity) {
 		if (activity == null || sPending == null || !sPending.available) {
 			return;
 		}
@@ -166,38 +154,51 @@ public final class UpdateCheck {
 			Toast.makeText(activity, R.string.update_check_failed, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		UpdateDownloader.downloadAndInstall(activity, href, new UpdateDownloader.Progress() {
-			@Override
-			public void onProgress(int percent, long received, long total) {
-				notifyDownload(activity, percent, false, null);
-			}
-
-			@Override
-			public void onDone() {
-				notifyDownload(activity, 100, false, null);
-			}
-
-			@Override
-			public void onError(String message) {
-				notifyDownload(activity, 0, true, message);
-			}
-		});
-	}
-
-	private static void notifyDownload(Activity activity, int percent, boolean error, String message) {
-		for (Listener listener : snapshotListeners()) {
-			if (listener instanceof DownloadListener) {
-				((DownloadListener) listener).onDownloadProgress(percent, error, message);
-			}
+		try {
+			activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(href)));
+		} catch (Exception e) {
+			Log.w(TAG, "update link failed", e);
+			Toast.makeText(activity, R.string.update_check_failed, Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	public interface DownloadListener extends Listener {
-		void onDownloadProgress(int percent, boolean error, String message);
+	private static void rememberApp(Context context) {
+		if (sApp == null && context != null) {
+			sApp = context.getApplicationContext();
+		}
 	}
 
-	private static void check(final Activity activity, final boolean manual, final boolean showDialog) {
+	private static void tryConnectCheck(boolean delay) {
+		if (!sWantConnectCheck || sHaveResult || sConnectTried || sApp == null) {
+			return;
+		}
 		if (sChecking) {
+			return;
+		}
+		if (delay) {
+			if (sConnectScheduled) {
+				return;
+			}
+			sConnectScheduled = true;
+			new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					tryConnectCheck(false);
+				}
+			}, 2500);
+			return;
+		}
+		sConnectTried = true;
+		check(sApp, true);
+	}
+
+	private static void check(final Context context, final boolean silent) {
+		if (sChecking || context == null) {
+			return;
+		}
+		String url = bakedUrl();
+		if (url.length() == 0) {
+			applyResult(failedInfo(context.getString(R.string.update_check_failed)), silent);
 			return;
 		}
 		sChecking = true;
@@ -206,37 +207,17 @@ public final class UpdateCheck {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				final Object out = fetch(activity, manual);
+				final Object out = fetch(context);
 				ui.post(new Runnable() {
 					@Override
 					public void run() {
 						sChecking = false;
-						if (activity.isFinishing()) {
-							return;
-						}
-						if (out instanceof String) {
-							Info none = noneInfo((String) out, true);
-							sPending = none;
-							notifyListeners(none, false);
-							if (manual) {
-								Toast.makeText(activity, (String) out, Toast.LENGTH_SHORT).show();
-							}
-							return;
-						}
 						if (out instanceof Info) {
-							Info info = (Info) out;
-							sPending = info;
-							notifyListeners(info, false);
-							if (info.available) {
-								if (showDialog || manual) {
-									showOffer(activity, info, manual);
-								}
-							} else if (manual) {
-								Toast.makeText(activity,
-										info.message.length() > 0 ? info.message
-												: activity.getString(R.string.update_up_to_date),
-										Toast.LENGTH_SHORT).show();
-							}
+							applyResult((Info) out, silent);
+						} else {
+							applyResult(failedInfo(out instanceof String
+									? (String) out
+									: context.getString(R.string.update_check_failed)), silent);
 						}
 					}
 				});
@@ -244,8 +225,22 @@ public final class UpdateCheck {
 		}, "update-check").start();
 	}
 
-	private static Object fetch(Context context, boolean manual) {
-		String rawUrl = resolveUrl(context);
+	private static void applyResult(Info info, boolean silent) {
+		if (info != null && info.failed && silent) {
+			notifyListeners(sPending, false);
+			tryConnectCheck(false);
+			return;
+		}
+		sPending = info;
+		sHaveResult = info != null && info.checked && !info.failed;
+		notifyListeners(sPending, false);
+		if (!sHaveResult) {
+			tryConnectCheck(false);
+		}
+	}
+
+	private static Object fetch(Context context) {
+		String rawUrl = bakedUrl();
 		if (rawUrl.length() == 0) {
 			return context.getString(R.string.update_check_failed);
 		}
@@ -288,28 +283,16 @@ public final class UpdateCheck {
 			if (info.versionCode <= 0) {
 				return context.getString(R.string.update_check_failed);
 			}
-			PreferenceManager.getDefaultSharedPreferences(context)
-					.edit()
-					.putLong(PREF_LAST_MS, System.currentTimeMillis())
-					.apply();
 
 			int installed = installedCode(context);
+			info.checked = true;
+			info.failed = false;
 			if (info.versionCode <= installed) {
 				info.available = false;
-				info.checked = true;
-				info.message = manual ? context.getString(R.string.update_up_to_date) : "";
-				return info;
-			}
-			SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
-			int snooze = getIntPref(p, PREF_SNOOZE_CODE, 0);
-			if (!manual && snooze == info.versionCode) {
-				info.available = false;
-				info.checked = true;
-				info.message = "";
+				info.message = context.getString(R.string.update_up_to_date);
 				return info;
 			}
 			info.available = true;
-			info.checked = true;
 			info.message = context.getString(R.string.update_available_title);
 			return info;
 		} catch (Exception e) {
@@ -322,43 +305,18 @@ public final class UpdateCheck {
 		}
 	}
 
-	private static Info noneInfo(String message, boolean checked) {
-		Info info = new Info();
-		info.available = false;
-		info.checked = checked;
-		info.message = message != null ? message : "";
-		return info;
+	private static String bakedUrl() {
+		String url = UpdateDefaults.bakedManifestUrl();
+		return url != null ? url.trim() : "";
 	}
 
-	private static void showOffer(final Activity activity, final Info info, boolean manual) {
-		String label = info.versionName.length() > 0 ? info.versionName
-				: Integer.toString(info.versionCode);
-		String msg = activity.getString(R.string.update_available_message, label);
-		if (info.notes.length() > 0) {
-			msg = msg + "\n\n" + info.notes;
-		}
-
-		AlertDialog.Builder b = new AlertDialog.Builder(activity)
-				.setTitle(R.string.update_available_title)
-				.setMessage(msg)
-				.setNegativeButton(R.string.update_later, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						PreferenceManager.getDefaultSharedPreferences(activity)
-								.edit()
-								.putInt(PREF_SNOOZE_CODE, info.versionCode)
-								.apply();
-					}
-				});
-		if (info.pageUrl.length() > 0) {
-			b.setPositiveButton(R.string.update_install, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					startInstall(activity);
-				}
-			});
-		}
-		b.show();
+	private static Info failedInfo(String message) {
+		Info info = new Info();
+		info.available = false;
+		info.checked = true;
+		info.failed = true;
+		info.message = message != null ? message : "";
+		return info;
 	}
 
 	private static void notifyListeners(Info info, boolean checking) {
@@ -429,29 +387,5 @@ public final class UpdateCheck {
 		}
 		in.close();
 		return new String(bos.toByteArray(), UTF8);
-	}
-
-	private static boolean getBoolPref(SharedPreferences p, String key, boolean def) {
-		try {
-			return p.getBoolean(key, def);
-		} catch (ClassCastException e) {
-			return def;
-		}
-	}
-
-	private static int getIntPref(SharedPreferences p, String key, int def) {
-		try {
-			return p.getInt(key, def);
-		} catch (ClassCastException e) {
-			return def;
-		}
-	}
-
-	private static long getLongPref(SharedPreferences p, String key, long def) {
-		try {
-			return p.getLong(key, def);
-		} catch (ClassCastException e) {
-			return def;
-		}
 	}
 }

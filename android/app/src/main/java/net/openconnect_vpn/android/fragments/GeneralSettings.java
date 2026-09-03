@@ -56,7 +56,8 @@ import net.openconnect_vpn.android.core.ThemeManager;
 import net.openconnect_vpn.android.core.UpdateCheck;
 
 public class GeneralSettings extends ThemedPreferenceFragment
-		implements OnPreferenceClickListener, OnClickListener, OnSharedPreferenceChangeListener {
+		implements OnPreferenceClickListener, OnClickListener, OnSharedPreferenceChangeListener,
+		UpdateCheck.Listener {
 
 	private ExternalAppDatabase mExtapp;
 	private PreferenceManager mPrefs;
@@ -98,6 +99,8 @@ public class GeneralSettings extends ThemedPreferenceFragment
 		if (checkNow != null) {
 			checkNow.setOnPreferenceClickListener(this);
 		}
+		bindVersionPref();
+		onUpdateState(UpdateCheck.current(), UpdateCheck.isChecking());
 
 		Preference savedLogins = findPreference("saved_domain_logins");
 		if (savedLogins != null) {
@@ -115,17 +118,19 @@ public class GeneralSettings extends ThemedPreferenceFragment
 		updateSavedLoginsUi();
 	}
 
-    @Override
+	@Override
 	public void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
 		updatePerAppUi(getPreferenceScreen().getSharedPreferences());
 		updateSavedLoginsUi();
+		UpdateCheck.addListener(this);
     }
 
     @Override
     public void onPause() {
+		UpdateCheck.removeListener(this);
         super.onPause();
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
@@ -148,6 +153,57 @@ public class GeneralSettings extends ThemedPreferenceFragment
 				ThemeManager.applyThemeChange(activity);
 			}
 		}
+	}
+
+	private void bindVersionPref() {
+		Preference pref = findPreference("app_version");
+		if (pref == null || getActivity() == null) {
+			return;
+		}
+		String name = UpdateCheck.installedVersionName(getActivity());
+		if (name.length() == 0) {
+			name = "?";
+		}
+		pref.setTitle(getString(R.string.app_version_pref, name));
+	}
+
+	@Override
+	public void onUpdateState(UpdateCheck.Info info, boolean checking) {
+		Preference pref = findPreference("update_check_now");
+		if (pref == null) {
+			return;
+		}
+		if (checking) {
+			pref.setTitle(R.string.update_checking);
+			pref.setSummary("");
+			pref.setSelectable(false);
+			return;
+		}
+		if (info != null && info.available) {
+			pref.setTitle(R.string.update_install);
+			if (info.versionName.length() > 0) {
+				pref.setSummary(info.versionName);
+			} else {
+				pref.setSummary("");
+			}
+			pref.setSelectable(true);
+			return;
+		}
+		if (info != null && info.checked && !info.failed && !info.available) {
+			pref.setTitle(R.string.update_up_to_date);
+			pref.setSummary("");
+			pref.setSelectable(false);
+			return;
+		}
+		if (info != null && info.failed) {
+			pref.setTitle(R.string.update_check_failed);
+			pref.setSummary("");
+			pref.setSelectable(true);
+			return;
+		}
+		pref.setTitle(R.string.update_check_now);
+		pref.setSummary("");
+		pref.setSelectable(true);
 	}
 
 	private void updateSavedLoginsUi() {

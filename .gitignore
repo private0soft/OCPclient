@@ -3,6 +3,11 @@
 Thumbs.db
 .directory
 *.log
+*.bak
+*.orig
+hs_err_pid*
+replay_pid*
+*.hprof
 
 # Secrets and machine-specific (never publish)
 **/.env
@@ -13,10 +18,15 @@ Thumbs.db
 **/*.keystore
 **/*.pem
 
-# Android local build trees
+# Signing secrets (keep the .example files)
+**/release.properties
+!**/release.properties.example
+
+# Android / Gradle local trees
 android/.gradle/
 android/.idea/
 android/.cxx/
+android/.kotlin/
 android/build/
 android/app/build/
 android/captures/
@@ -28,14 +38,13 @@ windows/src-tauri/target/
 windows/src-tauri/gen/
 windows/build.cmd
 windows/Build.md
+
 # Packages — except the stable Windows installer and Android APK GitHub serves
 *.exe
 *.apk
+*.apk.idsig
 *.aab
+*.apks
 *.msi
 !windows/OpenConnect +P_latest_x64-setup.exe
 !android/OpenConnect-P_latest.apk
-
-# Signing secrets (keep the .example files)
-**/release.properties
-!**/release.properties.example

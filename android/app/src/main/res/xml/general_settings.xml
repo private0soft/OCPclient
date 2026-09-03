@@ -16,6 +16,18 @@
     </PreferenceCategory>
 -->
 
+    <PreferenceCategory android:title="@string/update_category">
+        <Preference
+            android:key="app_version"
+            android:persistent="false"
+            android:selectable="false"
+            android:title="" />
+        <Preference
+            android:key="update_check_now"
+            android:persistent="false"
+            android:title="@string/update_check_now" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/appearance_category">
         <ListPreference
             android:key="app_theme"
@@ -76,20 +88,6 @@
             android:selectable="false"
             android:summary="@string/per_app_reconnect_hint"
             android:title="" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/update_category">
-        <CheckBoxPreference
-            android:key="update_checks_enabled"
-            android:title="@string/update_checks_enabled_title"
-            android:summary="@string/update_checks_enabled_summary"
-            android:defaultValue="false" />
-        <Preference
-            android:key="update_check_now"
-            android:dependency="update_checks_enabled"
-            android:persistent="false"
-            android:title="@string/update_check_now"
-            android:summary="@string/update_check_now_summary" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/advanced">

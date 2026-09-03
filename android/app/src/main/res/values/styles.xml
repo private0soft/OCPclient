@@ -148,10 +148,14 @@
 
     <style name="MyOC.DialogPreference">
         <item name="android:layout">@layout/myoc_preference</item>
+        <item name="android:positiveButtonText">@android:string/ok</item>
+        <item name="android:negativeButtonText">@android:string/cancel</item>
     </style>
 
     <style name="MyOC.EditTextPreference">
         <item name="android:layout">@layout/myoc_preference</item>
+        <item name="android:positiveButtonText">@android:string/ok</item>
+        <item name="android:negativeButtonText">@android:string/cancel</item>
     </style>
 
     <style name="MyOC.CheckBox" parent="@android:style/Widget.Material.Light.CompoundButton.CheckBox">

@@ -39,12 +39,11 @@ import android.widget.Toast;
 import net.openconnect_vpn.android.core.OpenConnectManagementThread;
 import net.openconnect_vpn.android.core.OpenVpnService;
 import net.openconnect_vpn.android.core.UpdateCheck;
-import net.openconnect_vpn.android.core.UpdateDownloader;
 import net.openconnect_vpn.android.core.VPNConnector;
 import net.openconnect_vpn.android.fragments.StatusFragment;
 import net.openconnect_vpn.android.fragments.VPNProfileList;
 
-public class MainActivity extends ThemedActivity implements UpdateCheck.DownloadListener {
+public class MainActivity extends ThemedActivity implements UpdateCheck.Listener {
 
 	public static final String TAG = "OpenConnect";
 
@@ -77,7 +76,7 @@ public class MainActivity extends ThemedActivity implements UpdateCheck.Download
 				});
 			}
 			ActionBar.LayoutParams lp = new ActionBar.LayoutParams(
-					ActionBar.LayoutParams.WRAP_CONTENT,
+					ActionBar.LayoutParams.MATCH_PARENT,
 					ActionBar.LayoutParams.MATCH_PARENT);
 			lp.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
 			bar.setCustomView(title, lp);
@@ -175,31 +174,10 @@ public class MainActivity extends ThemedActivity implements UpdateCheck.Download
 		}
 		if (info != null && info.available) {
 			mUpdateButton.setVisibility(View.VISIBLE);
-			mUpdateButton.setEnabled(!checking && !UpdateDownloader.isBusy());
+			mUpdateButton.setEnabled(!checking);
 			mUpdateButton.setText(getString(R.string.update_tag));
 		} else {
 			mUpdateButton.setVisibility(View.GONE);
-		}
-	}
-
-	@Override
-	public void onDownloadProgress(int percent, boolean error, String message) {
-		if (mUpdateButton == null) {
-			return;
-		}
-		if (error) {
-			mUpdateButton.setEnabled(true);
-			mUpdateButton.setText(getString(R.string.update_tag));
-			if (message != null && message.length() > 0) {
-				Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-			}
-			return;
-		}
-		mUpdateButton.setEnabled(false);
-		if (percent > 0) {
-			mUpdateButton.setText(percent + "%");
-		} else {
-			mUpdateButton.setText("…");
 		}
 	}
 

@@ -1,5 +1,6 @@
-# Copy to release.properties and fill in your keystore password.
+# Copy to release.properties next to this file and fill in the password.
 # Do not commit release.properties or your .jks file.
-path=/home/masoud/myoc-release.jks
+# Put myoc-release.jks in android/app/ (same folder as this example).
+path=myoc-release.jks
 alias=myoc
 password=YOUR_KEYSTORE_PASSWORD
