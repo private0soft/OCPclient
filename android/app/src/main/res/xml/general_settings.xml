@@ -21,8 +21,8 @@
             android:key="app_version"
             android:persistent="false"
             android:selectable="false"
-            android:title="" />
-        <Preference
+            android:title="@string/app_version_pref" />
+        <net.openconnect_vpn.android.ActionPref
             android:key="update_check_now"
             android:persistent="false"
             android:title="@string/update_check_now" />

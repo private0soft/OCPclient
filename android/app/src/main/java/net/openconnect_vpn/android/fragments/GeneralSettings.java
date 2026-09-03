@@ -173,37 +173,25 @@ public class GeneralSettings extends ThemedPreferenceFragment
 		if (pref == null) {
 			return;
 		}
+		pref.setEnabled(true);
+		pref.setSelectable(true);
 		if (checking) {
 			pref.setTitle(R.string.update_checking);
-			pref.setSummary("");
-			pref.setSelectable(false);
 			return;
 		}
 		if (info != null && info.available) {
 			pref.setTitle(R.string.update_install);
-			if (info.versionName.length() > 0) {
-				pref.setSummary(info.versionName);
-			} else {
-				pref.setSummary("");
-			}
-			pref.setSelectable(true);
 			return;
 		}
 		if (info != null && info.checked && !info.failed && !info.available) {
 			pref.setTitle(R.string.update_up_to_date);
-			pref.setSummary("");
-			pref.setSelectable(false);
 			return;
 		}
 		if (info != null && info.failed) {
 			pref.setTitle(R.string.update_check_failed);
-			pref.setSummary("");
-			pref.setSelectable(true);
 			return;
 		}
 		pref.setTitle(R.string.update_check_now);
-		pref.setSummary("");
-		pref.setSelectable(true);
 	}
 
 	private void updateSavedLoginsUi() {
@@ -285,6 +273,7 @@ public class GeneralSettings extends ThemedPreferenceFragment
 			return true;
 		}
 		if ("update_check_now".equals(preference.getKey())) {
+			preference.setTitle(R.string.update_checking);
 			UpdateCheck.runNow(getActivity());
 			return true;
 		}
