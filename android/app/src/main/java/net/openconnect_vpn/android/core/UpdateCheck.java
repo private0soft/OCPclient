@@ -1,6 +1,8 @@
 /*
  * HTTPS-only version manifest. Automatic checks are silent.
- * The download URL is opened in the browser when the user taps Update.
+ * Update APK is fetched over HTTPS (GitHub raw) and installed with the
+ * Android APK MIME type. Opening raw.githubusercontent.com in a browser
+ * stores application/octet-stream and the installer reports an invalid package.
  *
  * Expected JSON:
  * {
@@ -25,12 +27,15 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -145,21 +150,57 @@ public final class UpdateCheck {
 		check(sApp, false);
 	}
 
-	public static void startInstall(Activity activity) {
+	public static void startInstall(final Activity activity) {
 		if (activity == null || sPending == null || !sPending.available) {
 			return;
 		}
-		String href = sPending.pageUrl != null ? sPending.pageUrl.trim() : "";
+		final String href = sPending.pageUrl != null ? sPending.pageUrl.trim() : "";
 		if (href.length() == 0) {
 			Toast.makeText(activity, R.string.update_check_failed, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		try {
-			activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(href)));
-		} catch (Exception e) {
-			Log.w(TAG, "update link failed", e);
-			Toast.makeText(activity, R.string.update_check_failed, Toast.LENGTH_SHORT).show();
+		if (Build.VERSION.SDK_INT >= 26
+				&& !activity.getPackageManager().canRequestPackageInstalls()) {
+			try {
+				activity.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+						Uri.parse("package:" + activity.getPackageName())));
+			} catch (Exception e) {
+				Log.w(TAG, "unknown sources settings failed", e);
+			}
+			Toast.makeText(activity, R.string.update_allow_unknown, Toast.LENGTH_LONG).show();
+			return;
 		}
+		if (UpdateDownloader.isBusy()) {
+			Toast.makeText(activity, R.string.update_download_busy, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		final AlertDialog wait = new AlertDialog.Builder(activity)
+				.setMessage(R.string.update_downloading)
+				.setCancelable(false)
+				.show();
+		UpdateDownloader.downloadAndInstall(activity, href, new UpdateDownloader.Progress() {
+			@Override
+			public void onProgress(int percent, long received, long total) {
+				if (wait.isShowing()) {
+					wait.setMessage(activity.getString(R.string.update_downloading_pct, percent));
+				}
+			}
+
+			@Override
+			public void onDone() {
+				if (wait.isShowing()) {
+					wait.dismiss();
+				}
+			}
+
+			@Override
+			public void onError(String message) {
+				if (wait.isShowing()) {
+					wait.dismiss();
+				}
+				Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
 	private static void rememberApp(Context context) {

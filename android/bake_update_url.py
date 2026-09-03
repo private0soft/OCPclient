@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import argparse
+import json
 import re
 import sys
 
@@ -32,6 +33,22 @@ def format_java_array(enc):
     return "\n".join(lines)
 
 
+def patch_manifest(path, version_code, version_name, notes):
+    """Update version fields only. Never touch the APK download url."""
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    url = (data.get("url") or "").strip()
+    if not url.lower().startswith("https://"):
+        raise SystemExit("%s must contain an https \"url\" for the APK download" % path)
+    data["versionCode"] = int(version_code)
+    data["versionName"] = version_name
+    data["notes"] = notes
+    data["url"] = url
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    print("Updated %s to %s (%s); download url unchanged" % (path, version_name, version_code))
+
+
 def bake(path, url):
     if not url.startswith("https://"):
         raise SystemExit("URL must start with https://")
@@ -51,6 +68,12 @@ def bake(path, url):
 
 
 def main(argv):
+    if argv and argv[0] == "--update-json":
+        if len(argv) < 4:
+            raise SystemExit("usage: bake_update_url.py --update-json FILE CODE NAME [NOTES]")
+        notes = argv[4] if len(argv) > 4 else ""
+        patch_manifest(argv[1], argv[2], argv[3], notes)
+        return
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("url", help="HTTPS update JSON URL")
     p.add_argument(

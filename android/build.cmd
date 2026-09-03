@@ -5,6 +5,7 @@ REM OpenConnect +P — Android release builder (Windows)
 REM
 REM Edit the three values below, then run:  build.cmd
 REM Or:  build.cmd --version 1.0.5 --code 105 --url https://host/android/ap.json
+REM The APK download link lives in ap.json ("url") — this script does not set it.
 REM =============================================================================
 
 cd /d "%~dp0"
@@ -43,7 +44,6 @@ set "VERSION=1.0.5"
 set "VERSION_CODE=105"
 set "UPDATE_URL=https://raw.githubusercontent.com/private0soft/OCPclient/refs/heads/main/android/ap.json"
 set "NOTES=Latest Android release"
-set "APK_URL="
 set "SKIP_BAKE=0"
 REM -------------------------------------------------
 
@@ -69,11 +69,6 @@ if /I "%~1"=="--notes" (
   shift & shift
   goto parse_args
 )
-if /I "%~1"=="--apk-url" (
-  set "APK_URL=%~2"
-  shift & shift
-  goto parse_args
-)
 if /I "%~1"=="--skip-bake" (
   set "SKIP_BAKE=1"
   shift
@@ -85,7 +80,7 @@ echo Unknown option: %~1
 goto usage
 
 :usage
-echo Usage: build.cmd [--version NAME] [--code N] [--url HTTPS_JSON] [--apk-url HTTPS_APK]
+echo Usage: build.cmd [--version NAME] [--code N] [--url HTTPS_JSON]
 exit /b 1
 
 :args_done
@@ -112,30 +107,25 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if "%APK_URL%"=="" (
-  set "APK_URL=%UPDATE_URL%"
-  if /I "!APK_URL:~-7!"=="ap.json" set "APK_URL=!APK_URL:~0,-7!OpenConnect-P_latest.apk"
-)
-
 echo.
 echo OpenConnect +P — Android release
 echo   versionName  %VERSION%
 echo   versionCode  %VERSION_CODE%
 echo   update JSON  (XOR-baked into UpdateDefaults — not plaintext)
-echo   apk url      %APK_URL%
 echo.
 
+set "PY="
+where python >nul 2>&1 && set "PY=python"
+if not defined PY (
+  where python3 >nul 2>&1 && set "PY=python3"
+)
+if not defined PY (
+  echo ERROR: python is required
+  exit /b 1
+)
+
 if "%SKIP_BAKE%"=="0" (
-  set "PY="
-  where python >nul 2>&1 && set "PY=python"
-  if not defined PY (
-    where python3 >nul 2>&1 && set "PY=python3"
-  )
-  if not defined PY (
-    echo ERROR: python is required to bake the update URL
-    exit /b 1
-  )
-  %PY% "%~dp0bake_update_url.py" "%UPDATE_URL%" "%~dp0app\src\main\java\net\openconnect_vpn\android\core\UpdateDefaults.java"
+  !PY! "%~dp0bake_update_url.py" "%UPDATE_URL%" "%~dp0app\src\main\java\net\openconnect_vpn\android\core\UpdateDefaults.java"
   if errorlevel 1 (
     echo ERROR: failed to bake update URL
     exit /b 1
@@ -168,24 +158,21 @@ if errorlevel 1 (
   exit /b 1
 )
 
-(
-  echo {
-  echo   "versionCode": %VERSION_CODE%,
-  echo   "versionName": "%VERSION%",
-  echo   "notes": "%NOTES%",
-  echo   "url": "%APK_URL%"
-  echo }
-) > "%~dp0ap.json"
-
+if not exist "%~dp0ap.json" (
+  echo ERROR: ap.json is missing. Put the APK download https url in that file.
+  exit /b 1
+)
+!PY! "%~dp0bake_update_url.py" --update-json "%~dp0ap.json" %VERSION_CODE% "%VERSION%" "%NOTES%"
+if errorlevel 1 (
+  echo ERROR: failed to update ap.json version fields
+  exit /b 1
+)
 if exist "%~dp0..\ap.json" (
-  (
-    echo {
-    echo   "versionCode": %VERSION_CODE%,
-    echo   "versionName": "%VERSION%",
-    echo   "notes": "%NOTES%",
-    echo   "url": "%APK_URL%"
-    echo }
-  ) > "%~dp0..\ap.json"
+  !PY! "%~dp0bake_update_url.py" --update-json "%~dp0..\ap.json" %VERSION_CODE% "%VERSION%" "%NOTES%"
+  if errorlevel 1 (
+    echo ERROR: failed to update ..\ap.json version fields
+    exit /b 1
+  )
 )
 
 echo.
@@ -193,7 +180,7 @@ echo Done.
 echo   APK:      %DST%
 echo   Manifest: %~dp0ap.json
 echo   Upload ap.json to: %UPDATE_URL%
-echo   Upload APK to:     %APK_URL%
+echo   APK download url is the "url" field in ap.json — edit it anytime, no rebuild.
 echo %SRC% | findstr /I unsigned >nul
 if not errorlevel 1 (
   echo.
