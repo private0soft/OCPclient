@@ -30,6 +30,7 @@ android/.kotlin/
 android/build/
 android/app/build/
 android/captures/
+build.cmd
 
 # Windows local build trees
 windows/node_modules/
