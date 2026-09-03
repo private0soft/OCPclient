@@ -48,4 +48,4 @@ windows/Build.md
 *.apks
 *.msi
 !windows/OpenConnect +P_latest_x64-setup.exe
-!android/OpenConnect-P_latest-release.apk
+!android/OpenConnect-P-latest-release.apk
