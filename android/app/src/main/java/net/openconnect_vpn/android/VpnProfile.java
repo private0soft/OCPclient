@@ -92,6 +92,16 @@ public class VpnProfile implements Comparable<VpnProfile> {
     }
 
     public String getName() {
+        if (mPrefs != null) {
+            try {
+                String n = mPrefs.getString("profile_name", mName);
+                if (n != null) {
+                    mName = n;
+                }
+            } catch (ClassCastException e) {
+                /* keep mName */
+            }
+        }
         return mName;
     }
 

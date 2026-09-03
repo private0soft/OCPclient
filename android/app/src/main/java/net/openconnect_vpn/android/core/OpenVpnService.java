@@ -444,7 +444,7 @@ public class OpenVpnService extends VpnService {
 
 	public Builder getVpnServiceBuilder() {
 		VpnService.Builder b = new VpnService.Builder();
-		b.setSession(profile.mName);
+		b.setSession(profile.getName());
 		b.setConfigureIntent(getMainActivityIntent());
 		/* Drop packets if the tunnel is up but the network is gone. Not a notification. */
 		b.setBlocking(true);

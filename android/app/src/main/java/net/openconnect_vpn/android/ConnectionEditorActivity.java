@@ -47,6 +47,10 @@ public class ConnectionEditorActivity extends ThemedActivity {
 
         ConnectionEditorFragment frag = new ConnectionEditorFragment();
         mUUID = getIntent().getStringExtra(getPackageName() + ".profileUUID");
+        VpnProfile current = ProfileManager.get(mUUID);
+        if (current != null) {
+            setProfileName(current.getName());
+        }
         Bundle args = new Bundle();
         args.putString("profileUUID", mUUID);
         frag.setArguments(args);

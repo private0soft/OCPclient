@@ -28,7 +28,6 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 
 public class FragActivity extends ThemedActivity {
 
@@ -45,7 +44,7 @@ public class FragActivity extends ThemedActivity {
 
 		ActionBar bar = getActionBar();
 		if (bar != null) {
-			bar.setDisplayHomeAsUpEnabled(true);
+			bar.setDisplayHomeAsUpEnabled(false);
 			bar.setDisplayShowHomeEnabled(false);
 			bar.setDisplayShowTitleEnabled(true);
 		}
@@ -63,15 +62,6 @@ public class FragActivity extends ThemedActivity {
 				finish();
 			}
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home) {
-			finish();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 }

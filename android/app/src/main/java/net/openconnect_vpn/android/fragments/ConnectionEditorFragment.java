@@ -162,6 +162,7 @@ public class ConnectionEditorFragment extends ThemedPreferenceFragment
 		}
 
         if (key.equals("profile_name")) {
+        	mProfile.mName = value;
         	((ConnectionEditorActivity)getActivity()).setProfileName(value);
         }
         if (key.equals("server_address") || key.equals("use_shared_login")) {

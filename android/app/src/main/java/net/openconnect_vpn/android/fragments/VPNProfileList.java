@@ -296,7 +296,9 @@ public class VPNProfileList extends ListFragment {
 
 		@Override
 		public int compare(VpnProfile lhs, VpnProfile rhs) {
-			return lhs.mName.compareTo(rhs.mName);
+			String a = lhs.getName() != null ? lhs.getName() : "";
+			String b = rhs.getName() != null ? rhs.getName() : "";
+			return a.compareTo(b);
 		}
 
 	}

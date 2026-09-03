@@ -35,7 +35,6 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionBarStyle">@style/MyOC.ActionBar</item>
         <item name="android:actionOverflowButtonStyle">@style/MyOC.Overflow</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_nav_back</item>
         <item name="android:actionMenuTextColor">@color/myoc_text</item>
         <item name="android:buttonStyle">@style/MyOC.Button</item>
         <item name="android:alertDialogTheme">@style/MyOC.Dialog</item>
@@ -78,7 +77,7 @@
         <item name="android:subtitleTextStyle">@style/MyOC.ActionBar.Title</item>
         <item name="android:elevation">0dp</item>
         <item name="android:height">56dp</item>
-        <item name="android:displayOptions">showTitle|homeAsUp</item>
+        <item name="android:displayOptions">showTitle</item>
     </style>
 
     <style name="MyOC.ActionBar.Title" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
